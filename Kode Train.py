@@ -7,6 +7,7 @@ from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 import os
 import albumentations as A  # Tidak perlu import pytorch
+import joblib
 
 # Fungsi untuk augmentasi gambar
 def augment_image(image):
@@ -36,6 +37,7 @@ def extract_hog_features(image):
         masked_gray, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=True
     )
     return fd
+
 
 # Fungsi untuk membaca gambar dan label dari folder
 def load_data(data_dir, resize_dim=(64, 128)):
@@ -136,7 +138,20 @@ y_pred = best_model.predict(X_test)
 accuracy = np.mean(y_pred == y_test) * 100
 print(f'Accuracy: {accuracy:.2f}%')
 
-# Menyimpan model SVM ke file (untuk menggunakan model nanti)
-import joblib
-joblib.dump(best_model, 'svm_apd_best_model.pkl')
-print("Model disimpan sebagai 'svm_apd_best_model.pkl'")
+# Menyimpan model ke dalam format XML menggunakan cv2.FileStorage
+model_params = {
+    'support_vectors': best_model.named_steps['svc'].support_vectors_,
+    'dual_coef': best_model.named_steps['svc'].dual_coef_,
+    'intercept': best_model.named_steps['svc'].intercept_,
+    'coef_': best_model.named_steps['svc'].coef_,
+    'n_support': best_model.named_steps['svc'].n_support_,
+    'classes': best_model.named_steps['svc'].classes_,
+}
+
+# Menyimpan ke dalam file XML
+xml_filename = 'svm_apd_best_model.xml'
+with cv2.FileStorage(xml_filename, cv2.FILE_STORAGE_WRITE) as fs:
+    for key, value in model_params.items():
+        fs.write(key, value)
+    
+print(f"Model disimpan dalam format XML sebagai '{xml_filename}'")
