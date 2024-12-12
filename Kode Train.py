@@ -138,20 +138,11 @@ y_pred = best_model.predict(X_test)
 accuracy = np.mean(y_pred == y_test) * 100
 print(f'Accuracy: {accuracy:.2f}%')
 
-# Menyimpan model ke dalam format XML menggunakan cv2.FileStorage
-model_params = {
-    'support_vectors': best_model.named_steps['svc'].support_vectors_,
-    'dual_coef': best_model.named_steps['svc'].dual_coef_,
-    'intercept': best_model.named_steps['svc'].intercept_,
-    'coef_': best_model.named_steps['svc'].coef_,
-    'n_support': best_model.named_steps['svc'].n_support_,
-    'classes': best_model.named_steps['svc'].classes_,
-}
+# Menyimpan label yang telah diproses ke dalam format XML menggunakan cv2.FileStorage
+xml_filename = 'processed_labels.xml'
+fs = cv2.FileStorage(xml_filename, cv2.FILE_STORAGE_WRITE)
 
-# Menyimpan ke dalam file XML
-xml_filename = 'svm_apd_best_model.xml'
-with cv2.FileStorage(xml_filename, cv2.FILE_STORAGE_WRITE) as fs:
-    for key, value in model_params.items():
-        fs.write(key, value)
+# Menulis label ke dalam file XML
+fs.write('labels', y_train)  # Menulis label latih (y_train)
     
 print(f"Model disimpan dalam format XML sebagai '{xml_filename}'")
