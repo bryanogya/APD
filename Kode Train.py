@@ -8,6 +8,17 @@ from sklearn.preprocessing import StandardScaler
 import os
 import albumentations as A  # Tidak perlu import pytorch
 
+# Fungsi untuk augmentasi gambar
+def augment_image(image):
+    transform = A.Compose([
+        A.HorizontalFlip(p=0.5),
+        A.Rotate(limit=40, p=0.5),
+        A.RandomBrightnessContrast(p=0.5),
+        A.RandomSizedCrop(min_max_height=(100, 200), height=128, width=64, p=0.5),
+    ])
+    augmented = transform(image=image)
+    return augmented['image']
+
 # Fungsi untuk ekstraksi fitur HOG berdasarkan warna oranye
 def extract_hog_features(image):
     # Deteksi warna oranye
@@ -25,17 +36,6 @@ def extract_hog_features(image):
         masked_gray, orientations=9, pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=True
     )
     return fd
-
-# Fungsi untuk augmentasi gambar
-def augment_image(image):
-    transform = A.Compose([
-        A.HorizontalFlip(p=0.5),
-        A.Rotate(limit=40, p=0.5),
-        A.RandomBrightnessContrast(p=0.5),
-        A.RandomSizedCrop(min_max_height=(100, 200), height=128, width=64, p=0.5),
-    ])
-    augmented = transform(image=image)
-    return augmented['image']
 
 # Fungsi untuk membaca gambar dan label dari folder
 def load_data(data_dir, resize_dim=(64, 128)):
