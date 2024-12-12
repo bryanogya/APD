@@ -143,6 +143,7 @@ xml_filename = 'processed_labels.xml'
 fs = cv2.FileStorage(xml_filename, cv2.FILE_STORAGE_WRITE)
 
 # Menulis label ke dalam file XML
-fs.write('labels', y_train)  # Menulis label latih (y_train)
+fs.write('features', X_train)
+fs.write('labels', y_train)
     
 print(f"Model disimpan dalam format XML sebagai '{xml_filename}'")
